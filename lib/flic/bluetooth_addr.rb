@@ -1,12 +1,17 @@
 module Flic
   class  BluetoothAddr
+    def self.parse(val)
+      return val if val.is_a?(BluetoothAddr)
+      new(val)
+    end
+
     attr_reader :raw, :coding
-    def initialize(str, coding = :str)
-      if coding == :server
-        @raw = str
+    def initialize(arg)
+      if arg.is_a?(Array)
+        @raw = arg
         @raw = decoded
       else
-        @raw = str
+        @raw = arg
       end
     end
 
