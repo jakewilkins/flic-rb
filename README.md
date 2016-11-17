@@ -1,8 +1,6 @@
 # Flic
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/flic`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Ruby client for the [Flic.io](http://flic.io) buttons linux [api](https://github.com/50ButtonsEach/fliclib-linux-hci/blob/master/ProtocolDocumentation.md#evtbuttonevent)
 
 ## Installation
 
@@ -22,8 +20,18 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+I'm testing with something like:
 
+```
+
+client = Flic::Client.new
+
+client.create_connection(24, 'bluetooth:address', :normal, 250)
+
+binding.pry
+
+client.listen_for_events
+```
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
