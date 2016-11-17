@@ -5,7 +5,7 @@ module Flic
 
       def initialize(str)
         super
-        @size, @unpacked = unpack
+        @unpacked = unpack
       end
 
       def size
@@ -50,22 +50,29 @@ module Flic
       enums({3 => :RemovedReason})
     end
 
-    class ButtonEvent < Base
+    class ButtonUpOrDown < Base
+      opcode 4
       packing 'L<CCL<'
       mapping %i|conn_id click_type queued time_diff|
       enums({3 => :ClickType})
     end
-    class ButtonUpOrDown < ButtonEvent
-      opcode 4
-    end
-    class ButtonClickOrHold < ButtonEvent
+    class ButtonClickOrHold < Base
       opcode 5
+      packing 'L<CCL<'
+      mapping %i|conn_id click_type queued time_diff|
+      enums({3 => :ClickType})
     end
-    class ButtonSingleOrDoubleClick < ButtonEvent
+    class ButtonSingleOrDoubleClick < Base
       opcode 6
+      packing 'L<CCL<'
+      mapping %i|conn_id click_type queued time_diff|
+      enums({3 => :ClickType})
     end
-    class ButtonSingleOrDoubleClickOrHold < ButtonEvent
+    class ButtonSingleOrDoubleClickOrHold < Base
       opcode 7
+      packing 'L<CCL<'
+      mapping %i|conn_id click_type queued time_diff|
+      enums({3 => :ClickType})
     end
 
     class NewVerifiedButton < Base
@@ -77,13 +84,28 @@ module Flic
 
     class GetInfoResponse < Base
       opcode 9
-      packing 'CC6CCS<CCS<C*'
+      packing 'CC6CCs<CCS<C*'
       mapping [:bluetooth_controller_state, [:my_bd_addr, 6], :my_bd_addr_type,
                :max_pending_connections, :max_concurrently_connected_buttons,
                :current_pending_connections, :currently_no_space_for_new_connection,
                :verified_buttons_count, [:button_addresses, :end]]
       bdaddr_at :my_bd_addr
-      enums({8 => :BdAddrType, 14 => :Bool})
+      enums({2 => :BluetoothControllerState, 9 => :BdAddrType, 13 => :Bool})
+
+      alias_method :raw_button_addresses, :button_addresses
+
+      def parsed_button_addresses
+        @parsed_button_addresses ||= begin
+          addrs = []
+          addresses = raw_button_addresses
+          while (addresses != []) do
+            six = addresses.shift(6)
+            addrs << Flic::BluetoothAddr.new(six)
+          end
+          addrs
+        end
+      end
+      alias_method :button_addresses, :parsed_button_addresses
     end
 
     class NoSpaceForNewConnection < Base
@@ -143,7 +165,7 @@ module Flic
       enums({3 => :ScanWizardResult})
     end
 
-    ALL = Events.constants - [:Base, :ButtonEvent]
+    ALL = Events.constants - [:Base]
     OPCODES = ALL.each_with_object({}) do |name, hsh|
       klass = Events.const_get(name)
       hsh[klass.opcode] = klass

@@ -20,7 +20,7 @@ module Flic
     end
 
     def decoded
-      raw.unpack('C6').reverse.map {|i| i.to_s(16)}.join(':')
+      raw.reverse.map {|i| i.to_s(16)}.join(':')
     end
 
     private

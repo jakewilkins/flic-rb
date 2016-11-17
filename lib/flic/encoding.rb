@@ -73,7 +73,7 @@ module Flic
                 EOM
               end
 
-              offset += (length - 1)
+              offset += (length)
             else
               method_body << <<-EOM
               def #{name}
@@ -121,6 +121,7 @@ module Flic
       self.class.enums.each do |index, enum|
         arr[index] = Enums.coded(enum, arr[index])
       end
+      arr
     end
 
     def decode_enums(arr)
@@ -129,6 +130,7 @@ module Flic
       self.class.enums.each do |index, enum|
         arr[index] = Enums.decoded(enum, arr[index])
       end
+      arr
     end
 
   end
