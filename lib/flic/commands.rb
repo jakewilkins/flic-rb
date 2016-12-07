@@ -15,7 +15,7 @@ module Flic
 
           raw.clone.tap {|t| t[index] = val.coded}.flatten
         else
-          raw.clone.tap {|t| t.shift}
+          raw.clone
         end
         code_enums(packable)
         packable.shift # drop the :size placeholder

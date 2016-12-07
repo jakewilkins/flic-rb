@@ -1,35 +1,32 @@
 module Flic
   class Client
-    attr_reader :sock
+    ButtonClick = Struct.new(:id, :click_type, :queued, :time_diff)
+    attr_reader :connection, :queue
     def initialize(options = {})
-      @sock = TCPSocket.new(options[:host] || 'localhost', options[:port] || 5551)
+      @queue = Queue.new
+      @connection = Connection.new(options, queue)
     end
 
     def get_info
-      command = Flic::Commands::GetInfo.new([])
-      sock.send(command.packed, 0)
-      get_one_event
+      connection.request(Flic::Commands::GetInfo.new([]))
     end
 
-    def create_connection(id, addr, latency_mode, disconnect_time)
-      command = Flic::Commands::CreateConnectionChannel.new([id, addr, latency_mode, disconnect_time])
-      sock.send(command.packed, 0)
-      get_one_event
+    def request_button_events(button_id, event_types)
+      connection.request_button_events(button_id, event_types)
     end
 
-    def get_one_event
-      raw_size = sock.recvmsg(2).first
-      packet = sock.recvmsg(raw_size.unpack('S<').first).first
-      Flic::Events.parse("#{raw_size}#{packet}")
+    def button_events_pending?
+      !queue.empty?
     end
 
-    def listen_for_events
-      @listening = true
-      while @listening
-        event = get_one_event
-        yield(event) if block_given?
-        p event unless block_given? || ENV['DEBUG']
+    def pending_button_events
+      arr = []
+      until queue.empty?
+        id, attrs = queue.pop
+        arr << ButtonClick.new(*attrs.unshift(id))
       end
+      arr
     end
   end
 end
+

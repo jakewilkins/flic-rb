@@ -50,29 +50,30 @@ module Flic
       enums({3 => :RemovedReason})
     end
 
-    class ButtonUpOrDown < Base
+    class ButtonEvent < Base; end
+    class ButtonUpOrDown < ButtonEvent
       opcode 4
       packing 'L<CCL<'
       mapping %i|conn_id click_type queued time_diff|
-      enums({3 => :ClickType})
+      enums({3 => :ClickType, 4 => :Bool})
     end
-    class ButtonClickOrHold < Base
+    class ButtonClickOrHold < ButtonEvent
       opcode 5
       packing 'L<CCL<'
       mapping %i|conn_id click_type queued time_diff|
-      enums({3 => :ClickType})
+      enums({3 => :ClickType, 4 => :Bool})
     end
-    class ButtonSingleOrDoubleClick < Base
+    class ButtonSingleOrDoubleClick < ButtonEvent
       opcode 6
       packing 'L<CCL<'
       mapping %i|conn_id click_type queued time_diff|
-      enums({3 => :ClickType})
+      enums({3 => :ClickType, 4 => :Bool})
     end
-    class ButtonSingleOrDoubleClickOrHold < Base
+    class ButtonSingleOrDoubleClickOrHold < ButtonEvent
       opcode 7
       packing 'L<CCL<'
       mapping %i|conn_id click_type queued time_diff|
-      enums({3 => :ClickType})
+      enums({3 => :ClickType, 4 => :Bool})
     end
 
     class NewVerifiedButton < Base
